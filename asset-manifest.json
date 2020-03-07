@@ -1,0 +1,23 @@
+{
+  "files": {
+    "main.css": "/vre-schedules/static/css/main.5f361e03.chunk.css",
+    "main.js": "/vre-schedules/static/js/main.d120138e.chunk.js",
+    "main.js.map": "/vre-schedules/static/js/main.d120138e.chunk.js.map",
+    "runtime-main.js": "/vre-schedules/static/js/runtime-main.8a202a1c.js",
+    "runtime-main.js.map": "/vre-schedules/static/js/runtime-main.8a202a1c.js.map",
+    "static/js/2.bf4717dc.chunk.js": "/vre-schedules/static/js/2.bf4717dc.chunk.js",
+    "static/js/2.bf4717dc.chunk.js.map": "/vre-schedules/static/js/2.bf4717dc.chunk.js.map",
+    "index.html": "/vre-schedules/index.html",
+    "precache-manifest.ff9642de0577496b5d210e9824979c57.js": "/vre-schedules/precache-manifest.ff9642de0577496b5d210e9824979c57.js",
+    "service-worker.js": "/vre-schedules/service-worker.js",
+    "static/css/main.5f361e03.chunk.css.map": "/vre-schedules/static/css/main.5f361e03.chunk.css.map",
+    "static/js/2.bf4717dc.chunk.js.LICENSE.txt": "/vre-schedules/static/js/2.bf4717dc.chunk.js.LICENSE.txt",
+    "static/media/logo.svg": "/vre-schedules/static/media/logo.5d5d9eef.svg"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.8a202a1c.js",
+    "static/js/2.bf4717dc.chunk.js",
+    "static/css/main.5f361e03.chunk.css",
+    "static/js/main.d120138e.chunk.js"
+  ]
+}

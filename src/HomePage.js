@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 
 class HomePage extends React.Component {
     constructor(props) {
@@ -6,17 +7,23 @@ class HomePage extends React.Component {
         this.state = {
             error: null,
             isLoaded: false,
-            schedule: [],
             directions: [],
+            directionsDropdownOpen: false,
+            selectedDirectionName: null,
             fromStations: [],
+            fromStationsDropdownOpen: false,
+            selectedFromStation: null,
             fromTrains: [],
+            fromTrainsDropdownOpen: false,
+            selectedFromTrain: null,
             toStations: [],
+            toStationsDropdownOpen: false,
+            selectedToStation: null,
             toTrain: null
         };
     }
 
     componentDidMount() {
-
         this.findDirections();
     }
 
@@ -60,7 +67,7 @@ class HomePage extends React.Component {
 
                     for (var i = 0; i < lines.length; i++) {
 
-                        if (i % columnCount == 0) {
+                        if (i % columnCount === 0) {
                             data.push([]);
                             x++;
                         }
@@ -134,21 +141,157 @@ class HomePage extends React.Component {
             .replace(/<\/a><\/td>/g, '</td>');
     }
 
+    toggleDirectionsDropdown = () => {
+        this.setState({
+            directionsDropdownOpen: !this.state.directionsDropdownOpen
+        });
+    }
+
+    selectDirectionName = (e) => {
+        this.setState({
+            selectedDirectionName: e.currentTarget.textContent
+        },
+            () => { this.populateFromStations(); });
+    }
+
+    populateFromStations = () => {
+        let fromStations = this.state.directions
+            .filter(direction => direction.label === this.state.selectedDirectionName)
+            .map(direction => direction.schedule[0].slice(1))[0];
+        this.setState({
+            fromStations: fromStations,
+            selectedFromStation: null
+        });
+    }
+
+    toggleFromStationsDropdown = () => {
+        this.setState({
+            fromStationsDropdownOpen: !this.state.fromStationsDropdownOpen
+        });
+    }
+
+    selectFromStation = (e) => {
+        this.setState({
+            selectedFromStation: parseInt(e.currentTarget.id)
+        },
+            () => { this.populateFromTrains(); });
+    }
+
+    populateFromTrains = () => {
+        let allTrains = this.state.directions
+            .filter(direction => direction.label === this.state.selectedDirectionName)
+            .map(direction => direction.schedule)[0];
+
+        let fromTrains = [];
+        for (let i = 1; i < allTrains.length; i++) {
+            fromTrains.push('[' + allTrains[i][0].padStart(11, ' ') + '] ' + allTrains[i][this.state.selectedFromStation]);
+        }
+        this.setState({
+            fromTrains: fromTrains
+        });
+    }
+
+    toggleFromTrainsDropdown = () => {
+        this.setState({
+            fromTrainsDropdownOpen: !this.state.fromTrainsDropdownOpen
+        });
+    }
+
+    selectFromTrain = (e) => {
+        this.setState({
+            selectedFromTrain: parseInt(e.currentTarget.id)
+        },
+        () => { this.populateToStations(); });
+    }
+
+    populateToStations = () => {
+        let toStations = this.state.directions
+            .filter(direction => direction.label === this.state.selectedDirectionName)
+            .map(direction => direction.schedule[0].slice(1))[0]
+            .slice(this.state.selectedFromStation + 1);
+
+        this.setState({
+            toStations: toStations
+        });
+    }
+
+    toggleToStationsDropdown = () => {
+        this.setState({
+            toStationsDropdownOpen: !this.state.toStationsDropdownOpen
+        });
+    }
+
+    selectToStation = (e) => {
+        this.setState({
+            selectedToStation: parseInt(e.currentTarget.id)
+        });
+    }
+
     render() {
-        const { error, isLoaded, directions } = this.state;
+        const { error, isLoaded, directions, directionsDropdownOpen, fromStations, fromStationsDropdownOpen, fromTrains, fromTrainsDropdownOpen, toStations, toStationsDropdownOpen } = this.state;
         if (error) {
             return <div>Error: {error.message}</div>;
         } else if (!isLoaded) {
             return <div>Loading...</div>;
         } else {
             return (
-                <ul>
-                    {directions.map(direction => (
-                        <li key={direction.label}>
-                            {direction.label}
-                        </li>
-                    ))}
-                </ul>
+                <div>
+                    <div>
+                        direction:
+                        <ButtonDropdown isOpen={directionsDropdownOpen} toggle={this.toggleDirectionsDropdown}>
+                            <DropdownToggle caret color="primary">
+                                {this.state.selectedDirectionName}
+                            </DropdownToggle>
+                            <DropdownMenu>
+                                {directions.map(direction => (
+                                    <DropdownItem id={direction.label} key={direction.label} onClick={this.selectDirectionName}>{direction.label}</DropdownItem>
+                                ))}
+                            </DropdownMenu>
+                        </ButtonDropdown>
+                    </div>
+
+                    <div>
+                        from station:
+                        <ButtonDropdown isOpen={fromStationsDropdownOpen} toggle={this.toggleFromStationsDropdown}>
+                            <DropdownToggle caret>
+                                {fromStations[this.state.selectedFromStation]}
+                            </DropdownToggle>
+                            <DropdownMenu>
+                                {fromStations.map((station, index) => (
+                                    <DropdownItem id={index} key={index} onClick={this.selectFromStation}>{station}</DropdownItem>
+                                ))}
+                            </DropdownMenu>
+                        </ButtonDropdown>
+                    </div>
+
+                    <div>
+                        from train:
+                        <ButtonDropdown isOpen={fromTrainsDropdownOpen} toggle={this.toggleFromTrainsDropdown}>
+                            <DropdownToggle caret>
+                                {fromTrains[this.state.selectedFromTrain]}
+                            </DropdownToggle>
+                            <DropdownMenu>
+                                {fromTrains.map((train, index) => (
+                                    <DropdownItem id={index} key={index} onClick={this.selectFromTrain}><pre>{train}</pre></DropdownItem>
+                                ))}
+                            </DropdownMenu>
+                        </ButtonDropdown>
+                    </div>
+
+                    <div>
+                        to station:
+                        <ButtonDropdown isOpen={toStationsDropdownOpen} toggle={this.toggleToStationsDropdown}>
+                            <DropdownToggle caret color="success">
+                                {toStations[this.state.selectedToStation]}
+                            </DropdownToggle>
+                            <DropdownMenu>
+                                {toStations.map((station, index) => (
+                                    <DropdownItem id={index} key={index} onClick={this.selectToStation}>{station}</DropdownItem>
+                                ))}
+                            </DropdownMenu>
+                        </ButtonDropdown>
+                    </div>
+                </div>
             );
         }
     }

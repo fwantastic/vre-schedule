@@ -12,7 +12,7 @@ class Footer extends React.Component {
           </div>
           <div>
             This data may go out of date when VRE website changes the layout, so please use this at your own risk.
-            Official VRE website: <a href="https://www.vre.org" target="_blank">vre.org</a>
+            Official VRE website: <a href="https://www.vre.org" target="_blank" rel="noopener noreferrer">vre.org</a>
           </div>
         </Container>
       </div>

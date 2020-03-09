@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem, Button } from 'reactstrap';
 
 class HomePage extends React.Component {
@@ -58,7 +58,6 @@ class HomePage extends React.Component {
             .then(
                 (result) => {
                     let cleansedResult = this.cleanseText(result);
-                    //   console.log(test);
 
                     let lines = cleansedResult.match(/[^\r\n]+/g);
 
@@ -75,12 +74,6 @@ class HomePage extends React.Component {
                         let value = this.findValue(lines[i]).trim();
                         data[x].push(value);
                     }
-
-                    console.log(data);
-
-                    // let rowRegex =/<th(.*?)<\/th>/g;
-                    // let matches = result.match(rowRegex);
-                    // console.log(matches);
 
                     let direction = {
                         label: directionName,
@@ -149,7 +142,11 @@ class HomePage extends React.Component {
 
     selectDirectionName = (e) => {
         this.setState({
-            selectedDirectionName: e.currentTarget.textContent
+            selectedDirectionName: e.currentTarget.textContent,
+            selectedFromStation: null,
+            selectedFromTrain: null,
+            selectedToStation: null,
+            arriveAt: null
         },
             () => { this.populateFromStations(); });
     }
@@ -172,7 +169,10 @@ class HomePage extends React.Component {
 
     selectFromStation = (e) => {
         this.setState({
-            selectedFromStation: parseInt(e.currentTarget.id)
+            selectedFromStation: parseInt(e.currentTarget.id),
+            selectedFromTrain: null,
+            selectedToStation: null,
+            arriveAt: null
         },
             () => { this.populateFromTrains(); });
     }
@@ -199,7 +199,9 @@ class HomePage extends React.Component {
 
     selectFromTrain = (e) => {
         this.setState({
-            selectedFromTrain: parseInt(e.currentTarget.id)
+            selectedFromTrain: parseInt(e.currentTarget.id),
+            selectedToStation: null,
+            arriveAt: null
         },
             () => { this.populateToStations(); });
     }

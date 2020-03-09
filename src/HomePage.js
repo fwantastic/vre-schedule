@@ -24,34 +24,44 @@ class HomePage extends React.Component {
     }
 
     componentDidMount() {
-        this.findDirections();
+        this.findDirections()
+        .then(() => {
+            this.setState({
+                isLoaded: true
+            });
+        });
     }
 
     findDirections() {
-        this.findFredericksburgNorthboundSchedule();
-        this.findFredericksburgSouthboundSchedule();
-        this.findManassasNorthboundSchedule();
-        this.findManassasSouthboundSchedule();
+        return new Promise((resolve, reject) => {
+            this.findFredericksburgNorthboundSchedule();
+            this.findFredericksburgSouthboundSchedule();
+            this.findManassasNorthboundSchedule();
+            this.findManassasSouthboundSchedule();
+
+            resolve();
+        })
     }
 
     findFredericksburgNorthboundSchedule() {
-        this.findSchedule('Fredericksburg Line - Northbound', 'https://www.vre.org/service/schedule/schedule-data/fredericksburg-line-northbound/', 14);
+        this.findSchedule('Fredericksburg Line - Northbound', 'https://www.vre.org/service/schedule/schedule-data/fredericksburg-line-northbound/', 14, 0);
     }
 
     findFredericksburgSouthboundSchedule() {
-        this.findSchedule('Fredericksburg Line - Southbound', 'https://www.vre.org/service/schedule/schedule-data/fredericksburg-line-southbound/', 14);
+        this.findSchedule('Fredericksburg Line - Southbound', 'https://www.vre.org/service/schedule/schedule-data/fredericksburg-line-southbound/', 14, 1);
     }
 
     findManassasNorthboundSchedule() {
-        this.findSchedule('Manassas Line - Northbound', 'https://www.vre.org/service/schedule/schedule-data/manassas-line-northbound/', 11);
+        this.findSchedule('Manassas Line - Northbound', 'https://www.vre.org/service/schedule/schedule-data/manassas-line-northbound/', 11, 2);
     }
 
     findManassasSouthboundSchedule() {
-        this.findSchedule('Manassas Line - Southbound', 'https://www.vre.org/service/schedule/schedule-data/manassas-line-southbound/', 11);
+        this.findSchedule('Manassas Line - Southbound', 'https://www.vre.org/service/schedule/schedule-data/manassas-line-southbound/', 11, 3);
     }
 
-    findSchedule(directionName, url, columnCount) {
+    findSchedule(directionName, url, columnCount, index) {
         const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+        // const proxyUrl = 'https://crossorigin.me/';
 
         fetch(proxyUrl + url)
             .then(result => result.text())
@@ -80,12 +90,12 @@ class HomePage extends React.Component {
                         schedule: data
                     };
 
-                    this.state.directions.push(direction);
-
+                    // this.state.directions.push(direction);
+                    let directions = this.state.directions;
+                    directions[index] = direction;
                     this.setState({
-                        isLoaded: true
+                        directions: directions
                     });
-
                 },
                 // Note: it's important to handle errors here
                 // instead of a catch() block so that we don't swallow
@@ -100,6 +110,8 @@ class HomePage extends React.Component {
             )
     }
 
+    // extracts value inside tags
+    // e.g. <td>abc</td> => abc
     findValue(line) {
         let regexp = /(?:>)(.*)(?:<)/;
         let match = line.match(regexp);
@@ -174,7 +186,8 @@ class HomePage extends React.Component {
             selectedToStation: null,
             arriveAt: null
         },
-            () => { this.populateFromTrains(); });
+            () => { this.populateFromTrains();
+                this.populateToStations(); });
     }
 
     populateFromTrains = () => {
@@ -200,10 +213,13 @@ class HomePage extends React.Component {
     selectFromTrain = (e) => {
         this.setState({
             selectedFromTrain: parseInt(e.currentTarget.id),
-            selectedToStation: null,
             arriveAt: null
         },
-            () => { this.populateToStations(); });
+            () => { 
+                if (this.state.selectedToStation) {
+                    this.calculateArrivalTime();
+                } 
+            });
     }
 
     populateToStations = () => {
@@ -284,7 +300,7 @@ class HomePage extends React.Component {
                     </div>
 
                     <div className="from-train">
-                        Train
+                        Depart At
                         <ButtonDropdown isOpen={fromTrainsDropdownOpen} toggle={this.toggleFromTrainsDropdown} style={{ width: "100%" }}>
                             <DropdownToggle caret>
                                 {fromTrains[this.state.selectedFromTrain]}
@@ -295,7 +311,7 @@ class HomePage extends React.Component {
                                 ))}
                             </DropdownMenu>
                         </ButtonDropdown>
-
+                        <span style={{fontSize: "0.5em"}}>S = Special schedules for holidays and snow days</span>
                     </div>
 
                     <div className="to-station">
@@ -312,7 +328,7 @@ class HomePage extends React.Component {
                         </ButtonDropdown>
                     </div>
 
-                    <div>
+                    <div className="arrive-at">
                         <div>
                             Arrive At
                         </div>

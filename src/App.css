@@ -36,3 +36,24 @@
     transform: rotate(360deg);
   }
 }
+
+.dropdown-toggle {
+  white-space: normal;
+}
+
+.direction {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.from-station {
+  padding-bottom: 10px;
+}
+
+.from-train {
+  padding-bottom: 20px;
+}
+
+.to-station {
+  padding-bottom: 10px;
+}

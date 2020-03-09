@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
+import { ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem, Button } from 'reactstrap';
 
 class HomePage extends React.Component {
     constructor(props) {
@@ -19,7 +19,7 @@ class HomePage extends React.Component {
             toStations: [],
             toStationsDropdownOpen: false,
             selectedToStation: null,
-            toTrain: null
+            arriveAt: null
         };
     }
 
@@ -184,7 +184,7 @@ class HomePage extends React.Component {
 
         let fromTrains = [];
         for (let i = 1; i < allTrains.length; i++) {
-            fromTrains.push('[' + allTrains[i][0].padStart(11, ' ') + '] ' + allTrains[i][this.state.selectedFromStation]);
+            fromTrains.push('[' + allTrains[i][0].padStart(11, ' ') + '] ' + allTrains[i][this.state.selectedFromStation + 1]);
         }
         this.setState({
             fromTrains: fromTrains
@@ -201,7 +201,7 @@ class HomePage extends React.Component {
         this.setState({
             selectedFromTrain: parseInt(e.currentTarget.id)
         },
-        () => { this.populateToStations(); });
+            () => { this.populateToStations(); });
     }
 
     populateToStations = () => {
@@ -224,21 +224,37 @@ class HomePage extends React.Component {
     selectToStation = (e) => {
         this.setState({
             selectedToStation: parseInt(e.currentTarget.id)
+        },
+            () => { this.calculateArrivalTime(); });
+    }
+
+    calculateArrivalTime = () => {
+        let allTrains = this.state.directions
+            .filter(direction => direction.label === this.state.selectedDirectionName)
+            .map(direction => direction.schedule)[0];
+
+        let arriveAt = allTrains[this.state.selectedFromTrain + 1][this.state.selectedFromStation + 1 + this.state.selectedToStation + 1];
+        this.setState({
+            arriveAt: arriveAt
         });
     }
 
     render() {
-        const { error, isLoaded, directions, directionsDropdownOpen, fromStations, fromStationsDropdownOpen, fromTrains, fromTrainsDropdownOpen, toStations, toStationsDropdownOpen } = this.state;
+        const { error, isLoaded, directions, directionsDropdownOpen, fromStations, fromStationsDropdownOpen, fromTrains, fromTrainsDropdownOpen, toStations, toStationsDropdownOpen, arriveAt } = this.state;
         if (error) {
             return <div>Error: {error.message}</div>;
         } else if (!isLoaded) {
             return <div>Loading...</div>;
         } else {
             return (
-                <div>
+                <div style={{ width: "300px", maxWidth: "300px" }}>
                     <div>
-                        direction:
-                        <ButtonDropdown isOpen={directionsDropdownOpen} toggle={this.toggleDirectionsDropdown}>
+                        <h3>VRE Schedule</h3>
+                    </div>
+                    <div className="direction">
+                        Direction
+
+                        <ButtonDropdown isOpen={directionsDropdownOpen} toggle={this.toggleDirectionsDropdown} style={{ width: "100%" }}>
                             <DropdownToggle caret color="primary">
                                 {this.state.selectedDirectionName}
                             </DropdownToggle>
@@ -250,9 +266,9 @@ class HomePage extends React.Component {
                         </ButtonDropdown>
                     </div>
 
-                    <div>
-                        from station:
-                        <ButtonDropdown isOpen={fromStationsDropdownOpen} toggle={this.toggleFromStationsDropdown}>
+                    <div className="from-station">
+                        From Station
+                        <ButtonDropdown isOpen={fromStationsDropdownOpen} toggle={this.toggleFromStationsDropdown} style={{ width: "100%" }}>
                             <DropdownToggle caret>
                                 {fromStations[this.state.selectedFromStation]}
                             </DropdownToggle>
@@ -262,11 +278,12 @@ class HomePage extends React.Component {
                                 ))}
                             </DropdownMenu>
                         </ButtonDropdown>
+
                     </div>
 
-                    <div>
-                        from train:
-                        <ButtonDropdown isOpen={fromTrainsDropdownOpen} toggle={this.toggleFromTrainsDropdown}>
+                    <div className="from-train">
+                        Train
+                        <ButtonDropdown isOpen={fromTrainsDropdownOpen} toggle={this.toggleFromTrainsDropdown} style={{ width: "100%" }}>
                             <DropdownToggle caret>
                                 {fromTrains[this.state.selectedFromTrain]}
                             </DropdownToggle>
@@ -276,11 +293,12 @@ class HomePage extends React.Component {
                                 ))}
                             </DropdownMenu>
                         </ButtonDropdown>
+
                     </div>
 
-                    <div>
-                        to station:
-                        <ButtonDropdown isOpen={toStationsDropdownOpen} toggle={this.toggleToStationsDropdown}>
+                    <div className="to-station">
+                        To Station
+                        <ButtonDropdown isOpen={toStationsDropdownOpen} toggle={this.toggleToStationsDropdown} style={{ width: "100%" }}>
                             <DropdownToggle caret color="success">
                                 {toStations[this.state.selectedToStation]}
                             </DropdownToggle>
@@ -291,7 +309,16 @@ class HomePage extends React.Component {
                             </DropdownMenu>
                         </ButtonDropdown>
                     </div>
+
+                    <div>
+                        <div>
+                            Arrive At
+                        </div>
+                        <Button color="success" style={{ width: "100%" }}>{arriveAt}</Button>
+                    </div>
                 </div>
+
+
             );
         }
     }
